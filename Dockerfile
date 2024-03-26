@@ -1,4 +1,4 @@
-ARG BASE_ALGORAND_VERSION="3.22.1-stable"
+ARG BASE_ALGORAND_VERSION="3.23.1-stable"
 FROM algorand/algod:$BASE_ALGORAND_VERSION as algod
 FROM urtho/algod-voitest-rly:latest as urtho
 
