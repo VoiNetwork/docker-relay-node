@@ -17,7 +17,7 @@ ENV TELEMETRY_NAME="${HOSTNAME}"
 
 RUN apt-get update && apt-get install -y curl ca-certificates
 
-HEALTHCHECK --interval=5s --timeout=10s --retries=3 --start-period=10s CMD ["/node/bin/algodhealth"]
+# HEALTHCHECK --interval=5s --timeout=10s --retries=3 --start-period=10s CMD ["/node/bin/algodhealth"]
 
 COPY --from=algod --chown=0:0 /node/bin/algod /node/bin/algod
 COPY --from=algod --chown=0:0 /node/bin/goal /node/bin/goal
