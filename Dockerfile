@@ -25,4 +25,4 @@ COPY --from=urtho --chown=0:0 /node/node_exporter /node/bin/node_exporter
 COPY --from=builder /dist/ /node/bin/
 COPY configuration /algod/configuration
 
-CMD ["/node/bin/start-node"]
+CMD "/node/bin/start-node"

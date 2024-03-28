@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -68,6 +70,24 @@ func main() {
 	err = copyConfiguration("/algod/configuration/config.json", "/algod/data/config.json")
 	if err != nil {
 		log.Fatalf("Failed to copy config.json: %v", err)
+	}
+
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	for _, i := range interfaces {
+		addrs, err := i.Addrs()
+		if err != nil {
+			fmt.Print(err)
+			continue
+		}
+
+		for _, addr := range addrs {
+			fmt.Printf("Interface Name: %v, IP Address: %v\n", i.Name, addr.String())
+		}
 	}
 
 	// Start algod
