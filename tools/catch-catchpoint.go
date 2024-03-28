@@ -7,8 +7,29 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
+	"strings"
 	"time"
 )
+
+func getLastNodeRound() (int, error) {
+	cmd := exec.Command("/node/bin/goal", "node", "lastround", "-d", "/algod/data")
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Println("Error running command:", err)
+		return -1, err
+	}
+
+	// Trim the output and parse it as a number
+	outputStr := strings.TrimSpace(string(output))
+	lastRound, err := strconv.Atoi(outputStr)
+	if err != nil {
+		fmt.Println("Error parsing output:", err)
+		return -1, err
+	}
+
+	return lastRound, nil
+}
 
 func main() {
 	client := http.Client{
@@ -54,12 +75,34 @@ func main() {
 			return
 		}
 
+		lastNodeRound, err := getLastNodeRound()
+		if err != nil {
+			fmt.Println("Error getting last round:", err)
+			return
+		}
+
+		var lastNetworkRound int
+
+		if lastRound, ok := result["last-round"].(float64); ok {
+			lastNetworkRound = int(lastRound)
+		} else {
+			fmt.Println("last-round not found in the response or is not a float64")
+			return
+		}
+
+		fmt.Printf("Last node round: %d, Last network round: %d\n", lastNodeRound, lastNetworkRound)
+
+		if (lastNodeRound) > lastNetworkRound-3000 {
+			fmt.Println("Current round is not that far behind, skipping catchup")
+			return
+		}
+
 		fmt.Println("Catching up to catchpoint:", catchpoint)
 		cmd := exec.Command("/node/bin/goal", "-d", "/algod/data", "node", "catchup", catchpoint)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 
-		err := cmd.Run()
+		err = cmd.Run()
 		if err != nil {
 			fmt.Println("Error running command:", err)
 			return
