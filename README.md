@@ -1,1 +1,3 @@
-# DO NOT USE - BREAKAGE EXPECTED AT ANY POINT IN TIME
+# DO NOT USE
+
+Project has moved to https://github.com/VoiNetwork
