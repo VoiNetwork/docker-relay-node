@@ -4,6 +4,7 @@ import (
 	"github.com/voinetwork/docker-relay-node/tools/utils"
 	"log"
 	"net"
+	"os"
 	"time"
 )
 
@@ -71,7 +72,18 @@ func startNodeExporter(pu utils.ProcessUtils) error {
 }
 
 func executeGetMetrics(pu utils.ProcessUtils) error {
-	_, err := pu.ExecuteCommand(getMetricsCmd, "-d", metricsDir)
+	err := os.RemoveAll(metricsDir)
+	if err != nil {
+		log.Fatalf("Failed to clean up metrics directory: %v", err)
+	}
+
+	fu := utils.FileUtils{}
+	err = fu.EnsureDirExists(metricsDir)
+	if err != nil {
+		return err
+	}
+
+	_, err = pu.ExecuteCommand(getMetricsCmd, "-d", metricsDir)
 	return err
 }
 
